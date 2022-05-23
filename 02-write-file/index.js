@@ -5,17 +5,36 @@ const rl = readline.createInterface({
   output: process.stdout
 });
 
-rl.question('enter content ? ', function (content) {
-    fs.writeFileSync('./02-write-file/file.txt', content, err => {
++function askPrompt(query) {
+    return new Promise(resolve => rl.question(query, ans => {
+        resolve(ans);
+    }))
+    }
+    
+    const writeCustomContent = async function() {
+    const content = await askPrompt("Please enter content:");
+    
+    fs.writeFile('./02-write-file/file.txt', content, err => {
         if (err) {
-          console.error(err);
+        console.error(err);
         }
-        // done!
-      });
-    rl.close();
+    });
+    };
+    
+    rl.on('line', (input) => {
+    if (input === 'exit') {
+        rl.close()
+    }
+    fs.appendFile('./02-write-file/file.txt', `\n${input}`, err => {
+        if (err) {
+        console.error(err);
+        }
+    });
 });
 
 rl.on('close', function () {
-  console.log('\nAtata !!!');
+    console.log('\nFile created! Have a nice day :)!');
   process.exit(0);
 });
+
+writeCustomContent();
